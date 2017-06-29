@@ -1,5 +1,7 @@
 package io.udash.rpc.utils
 
+import javax.servlet.ServletConfig
+
 import io.udash.rpc.serialization.{DefaultExceptionCodecRegistry, ExceptionCodecRegistry}
 import io.udash.rpc.{AtmosphereService, AtmosphereServiceConfig}
 import org.atmosphere.cpr.{ApplicationConfig, AtmosphereFramework}
@@ -21,4 +23,10 @@ class DefaultAtmosphereFramework(config: AtmosphereServiceConfig[_],
   addInitParameter(ApplicationConfig.BROADCASTER_ASYNC_WRITE_THREADPOOL_MAXSIZE, "4")
   addInitParameter(ApplicationConfig.BROADCASTER_SHARABLE_THREAD_POOLS, "true")
   addInitParameter(ApplicationConfig.BROADCASTER_LIFECYCLE_POLICY, "EMPTY_DESTROY")
+  addInitParameter(ApplicationConfig.ANALYTICS, "false")
+
+  override def init(sc: ServletConfig): AtmosphereFramework = {
+    super.init(sc)
+    addAtmosphereHandler("/*", new AtmosphereService(config, exceptionsRegistry)(executionContext))
+  }
 };
